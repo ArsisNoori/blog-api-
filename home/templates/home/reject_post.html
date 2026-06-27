@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}
+رد کردن پست
+{% endblock %}
+
+{% block content %}
+
+<h2>رد کردن پست</h2>
+
+<div class="card">
+    <div class="card-body">
+
+        <h4>{{ view.post_obj.title }}</h4>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {{ form.as_p }}
+
+            <button type="submit"
+                    class="btn btn-danger">
+                رد کردن پست
+            </button>
+
+            <a href="{% url 'home:manage_posts' %}"
+               class="btn btn-secondary">
+                انصراف
+            </a>
+
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

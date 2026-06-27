@@ -1,0 +1,15 @@
+<!-- register.html -->
+{% extends 'base.html' %}
+{% block title %}ثبت‌نام{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <h2>ثبت‌نام</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-success">ثبت‌نام</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

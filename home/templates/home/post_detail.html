@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load mptt_tags %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1>{{ post.title }}</h1>
+        <p class="text-muted">
+            نویسنده: {{ post.user.username }} |
+            تاریخ: {{ post.created|date:"Y/m/d" }} |
+            دسته: {% if post.category %}{{ post.category.name }}{% else %}بدون دسته{% endif %}
+        </p>
+        {% if post.image %}
+            <img src="{{ post.image.url }}" class="img-fluid mb-3" alt="{{ post.title }}">
+        {% endif %}
+        <div>{{ post.content|safe }}</div>
+<form method="post" action="{% url 'home:post_reaction' post.slug %}">
+    {% csrf_token %}
+
+    <button
+        type="submit"
+        name="reaction"
+        value="like"
+        class="btn btn-success">
+        لایک
+        {{post.likes_count}}
+    </button>
+
+    <button
+        type="submit"
+        name="reaction"
+        value="dislike"
+        class="btn btn-danger">
+        دیسلایک
+        {{post.dislikes_count}}
+    </button>
+</form>
+        <!-- Edit/Delete for author or admin -->
+        {% if user == post.user or user.is_superuser %}
+            <div class="mt-4">
+                <a href="{% url 'home:update_post' post.slug %}" class="btn btn-warning">ویرایش</a>
+                <a href="{% url 'home:delete_post' post.slug %}" class="btn btn-danger">حذف</a>
+            </div>
+        {% endif %}
+
+        <!-- Comments -->
+        <hr>
+        <h3>نظرات ({{ post.comments.count }})</h3>
+
+        <!-- فرم ثبت نظر جدید (سطح اصلی) -->
+        {% if user.is_authenticated %}
+            <h4>نظر خود را بنویسید</h4>
+            <form method="post" action="{% url 'home:create_comment' post.slug %}">
+                {% csrf_token %}
+                {{ comment_form.as_p }}
+                <input type="hidden" name="parent_id" value="">
+                <button type="submit" class="btn btn-success">ارسال نظر</button>
+            </form>
+        {% else %}
+            <p>برای ثبت نظر <a href="{% url 'accounts:user_login' %}">وارد شوید</a>.</p>
+        {% endif %}
+
+        <!-- نمایش درخت نظرات با MPTT -->
+        <div class="comments-tree mt-4">
+            {% recursetree comments %}
+                <div class="card mb-2" style="margin-right: {% if node.level > 0 %} {{ node.level|add:2 }}0px{% else %}0{% endif %};">
+                    <div class="card-body">
+                        <strong>{{ node.user.username }}</strong>
+                        <small class="text-muted">{{ node.created|date:"Y/m/d H:i" }}</small>
+                        <p>{{ node.content }}</p>
+                        {% if user == node.user or user.is_superuser %}
+                            <a href="{% url 'home:update_comment' node.id %}"
+                               class="btn btn-sm btn-warning">
+                                ویرایش
+                            </a>
+
+                            <a href="{% url 'home:delete_comment' node.id %}"
+                               class="btn btn-sm btn-danger">
+                                حذف
+                            </a>
+                        {% endif %}
+                        <form method="post"
+                              action="{% url 'home:like_comment' node.id %}"
+                              style="display:inline;">
+                            {% csrf_token %}
+
+                            <button type="submit"
+                                    class="btn btn-sm btn-outline-primary">
+
+                                {% if user in node.likes.all %}
+                                    آنلایک
+                                {% else %}
+                                    لایک
+                                {% endif %}
+
+                                ({{ node.like.count }})
+                            </button>
+                        </form>
+                        {% if user.is_authenticated %}
+                            <button class="btn btn-sm btn-link reply-btn" data-comment-id="{{ node.id }}">پاسخ</button>
+                            <div id="reply-form-{{ node.id }}" style="display: none; margin-top: 10px;">
+                                <form method="post" action="{% url 'home:create_comment' post.slug %}">
+                                    {% csrf_token %}
+                                    {{ comment_form.as_p }}
+                                    <input type="hidden" name="parent_id" value="{{ node.id }}">
+                                    <button type="submit" class="btn btn-sm btn-success">ارسال پاسخ</button>
+                                </form>
+                            </div>
+                        {% endif %}
+
+                        {% if not node.is_leaf_node %}
+                            <div class="replies mt-2">
+                                {{ children }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endrecursetree %}
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">جستجو</div>
+            <div class="card-body">
+                <form method="get" action="{% url 'home:home' %}">
+                    <input type="text" name="q" class="form-control" placeholder="جستجو...">
+                    <button type="submit" class="btn btn-primary mt-2 w-100">جستجو</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // نمایش/پنهان کردن فرم پاسخ با کلیک روی دکمه پاسخ
+    document.querySelectorAll('.reply-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const commentId = this.dataset.commentId;
+            const formDiv = document.getElementById(`reply-form-${commentId}`);
+            if (formDiv.style.display === 'none') {
+                formDiv.style.display = 'block';
+            } else {
+                formDiv.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

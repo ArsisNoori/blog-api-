@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h3>حذف نظر</h3>
+
+<p>آیا از حذف این نظر مطمئن هستید؟</p>
+
+<p>{{ comment.content }}</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">
+        حذف
+    </button>
+</form>
+{% endblock %}

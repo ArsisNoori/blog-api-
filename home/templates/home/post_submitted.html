@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}
+پست ثبت شد
+{% endblock %}
+
+{% block content %}
+
+<div class="card shadow">
+
+    <div class="card-body">
+
+        <h2 class="text-success">
+            پست با موفقیت ثبت شد
+        </h2>
+
+        <hr>
+
+        <h4>
+            {{ post.title }}
+        </h4>
+
+        <p>
+            پست شما ثبت شده و در انتظار بررسی و تایید مدیر سایت است.
+        </p>
+
+        <p>
+            وضعیت فعلی:
+            <strong>
+                {{ post.get_status_display }}
+            </strong>
+        </p>
+
+        {% if post.admin_note %}
+            <div class="alert alert-danger">
+                <strong>توضیح مدیر:</strong>
+                <br>
+                {{ post.admin_note }}
+            </div>
+        {% endif %}
+
+        <div class="mt-4">
+            
+            <a href="{% url 'home:post_detail' post.slug %}"
+               class="btn btn-info">
+                مشاهده جزئیات
+            </a>
+
+            <a href="{% url 'home:update_post' post.slug %}"
+               class="btn btn-warning">
+                ویرایش
+            </a>
+
+            <a href="{% url 'home:delete_post' post.slug %}"
+               class="btn btn-danger">
+                حذف
+            </a>
+
+            <a href="{% url 'home:author_dashboard' %}"
+               class="btn btn-secondary">
+                بازگشت به داشبورد
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

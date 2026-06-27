@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}خانه - وبلاگ من{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Main posts -->
+    <div class="col-md-8">
+        <h2>آخرین پست‌ها</h2>
+        {% for post in posts %}
+            <div class="card mb-4">
+                {% if post.image %}
+                    <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}">
+                {% endif %}
+                <div class="card-body">
+                    <h3 class="card-title">{{ post.title }}</h3>
+                    <p class="text-muted">نویسنده: {{ post.user.username }} | {{ post.created_at|date:"Y/m/d" }}</p>
+                    <p class="card-text">{{ post.excerpt|truncatewords:30|safe }}</p>
+                    <a href="{% url 'home:post_detail' post.slug %}" class="btn btn-primary">بیشتر بخوانید</a>
+                </div>
+            </div>
+        {% empty %}
+            <p>هیچ پستی یافت نشد.</p>
+        {% endfor %}
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <nav>
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}">اول</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">قبلی</a></li>
+                {% endif %}
+                <li class="page-item active"><span class="page-link">صفحه {{ page_obj.number }}</span></li>
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}">بعدی</a></li>
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}">آخر</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+
+    <!-- Sidebar -->
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">جستجو</div>
+            <div class="card-body">
+                <form method="get">
+                    <input type="text" name="q" class="form-control" placeholder="جستجو..." value="{{ search_query }}">
+                    <button type="submit" class="btn btn-primary mt-2 w-100">جستجو</button>
+                    <a href="{% url 'home:home' %}" class="btn btn-warning mt-2 w-100">حذف فیلتر </a>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">دسته‌بندی‌ها</div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    {% for cat in categories %}
+                        <li><a href="?category={{ cat.slug }}">{{ cat.name }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

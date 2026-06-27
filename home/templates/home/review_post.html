@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}
+بررسی پست
+{% endblock %}
+
+{% block content %}
+
+<h1>{{ post.title }}</h1>
+
+<hr>
+
+<p>
+    نویسنده:
+    {{ post.user.username }}
+</p>
+
+<p>
+    وضعیت:
+    {{ post.get_status_display }}
+</p>
+
+<p>
+    تاریخ:
+    {{ post.created|date:"Y/m/d H:i" }}
+</p>
+
+{% if post.image %}
+    <img src="{{ post.image.url }}"
+         class="img-fluid mb-3">
+{% endif %}
+
+<h4>خلاصه</h4>
+
+<p>
+    {{ post.excerpt }}
+</p>
+
+<hr>
+
+<h4>متن کامل</h4>
+
+<div>
+    {{ post.content|safe }}
+</div>
+
+<hr>
+
+<div class="d-flex gap-2">
+
+    <form method="post"
+          action="{% url 'home:publish_post' post.slug %}">
+        {% csrf_token %}
+        <button class="btn btn-success">
+            انتشار
+        </button>
+    </form>
+
+    <form method="post"
+          action="{% url 'home:unpublish_post' post.slug %}">
+        {% csrf_token %}
+        <button class="btn btn-danger">
+            رد کردن
+        </button>
+    </form>
+</div>
+
+{% endblock %}

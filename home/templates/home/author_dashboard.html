@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}
+پنل نویسنده
+{% endblock %}
+
+{% block content %}
+
+<h2>پنل نویسنده</h2>
+
+<div class="row mb-4">
+
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5>{{ total_posts }}</h5>
+                <p>کل پست‌ها</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5>{{ published_posts }}</h5>
+                <p>منتشر شده</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5>{{ pending_posts }}</h5>
+                <p>در انتظار تایید</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card">
+            <div class="card-body">
+                <h5>{{ rejected_posts }}</h5>
+                <p>رد شده</p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<a href="{% url 'home:create_post' %}"
+   class="btn btn-primary mb-3">
+    ساخت پست جدید
+</a>
+
+<table class="table table-bordered">
+
+    <thead>
+        <tr>
+            <th>عنوان</th>
+            <th>وضعیت</th>
+            <th>تاریخ</th>
+            <th>عملیات</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        {% for post in posts %}
+
+        <tr>
+
+            <td>{{ post.title }}</td>
+
+            <td>
+                {{ post.get_status_display }}
+            </td>
+
+            <td>
+                {{ post.created|date:"Y/m/d" }}
+            </td>
+
+            <td>
+
+                <a href="{% url 'home:post_detail' post.slug %}"
+                   class="btn btn-sm btn-info">
+                    مشاهده
+                </a>
+
+                <a href="{% url 'home:update_post' post.slug %}"
+                   class="btn btn-sm btn-warning">
+                    ویرایش
+                </a>
+
+                <a href="{% url 'home:delete_post' post.slug %}"
+                   class="btn btn-sm btn-danger">
+                    حذف
+                </a>
+
+            </td>
+
+        </tr>
+
+        {% if post.status == 'rejected' and post.admin_note %}
+        <tr>
+            <td colspan="4">
+
+                <div class="alert alert-danger mb-0">
+                    <strong>دلیل رد شدن:</strong>
+                    {{ post.admin_note }}
+                </div>
+
+            </td>
+        </tr>
+        {% endif %}
+
+        {% empty %}
+
+        <tr>
+            <td colspan="4">
+                هنوز پستی ثبت نکرده‌اید.
+            </td>
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
+
+</table>
+
+{% endblock %}

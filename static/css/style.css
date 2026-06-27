@@ -1,0 +1,17 @@
+body {
+    font-family: 'Tahoma', 'Vazir', sans-serif;
+    background: #f8f9fa;
+}
+.card {
+    border-radius: 15px;
+    transition: transform 0.2s;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+.navbar-brand {
+    font-weight: bold;
+}
+footer {
+    font-size: 0.9rem;
+}
